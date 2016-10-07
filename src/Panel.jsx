@@ -4,7 +4,6 @@ import Board from './Board';
 import Preview from './Preview';
 import Ribbon from './Ribbon';
 import Alpha from './Alpha';
-import Params from './Params';
 
 function noop() {
 }
@@ -122,16 +121,6 @@ export default class Panel extends React.Component {
                 hsv={hsv}
                 />
             </div>
-          </div>
-          <div className={prefixCls + '-' + ('wrap')} style={{height: 40, marginTop: 6}}>
-            <Params
-              rootPrefixCls={prefixCls}
-              hsv={this.state.paramsHsv}
-              alpha={alpha}
-              onAlphaChange={this.onAlphaChange}
-              onChange={this.onChange}
-              mode={this.props.mode}
-              />
           </div>
         </div>
       </div>
