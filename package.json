@@ -48,8 +48,7 @@
   },
   "dependencies": {
     "colr": "~1.2.1",
-    "rc-trigger": "1.x",
-    "rc-util": "2.x"
+    "rc-trigger": "1.x"
   },
   "pre-commit": [
     "lint"

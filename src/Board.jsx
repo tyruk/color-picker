@@ -1,7 +1,6 @@
 import Colr from 'colr';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import rcUtil from 'rc-util';
 
 const colr = new Colr();
 
@@ -25,6 +24,7 @@ export default class Board extends React.Component {
   }
 
   componentWillUnmount() {
+    this.unloaded = true;
     this.removeListeners();
     this.removeTouchListeners();
   }
@@ -36,8 +36,9 @@ export default class Board extends React.Component {
       x,
       y,
     });
-    this.dragListener = rcUtil.Dom.addEventListener(window, 'mousemove', this.onBoardDrag);
-    this.dragUpListener = rcUtil.Dom.addEventListener(window, 'mouseup', this.onBoardDragEnd);
+
+    window.addEventListener('mousemove', this.onBoardDrag, false);
+    window.addEventListener('mouseup', this.onBoardDragEnd, false);
   }
 
   onBoardTouchStart(e) {
@@ -51,8 +52,8 @@ export default class Board extends React.Component {
       x,
       y,
     });
-    this.touchMoveListener = rcUtil.Dom.addEventListener(window, 'touchmove', this.onBoardTouchMove);
-    this.touchEndListener = rcUtil.Dom.addEventListener(window, 'touchend', this.onBoardTouchEnd);
+    window.addEventListener('touchmove', this.onBoardTouchMove, false);
+    window.addEventListener('touchend', this.onBoardTouchEnd, false);
   }
 
   onBoardTouchMove(e) {
@@ -96,25 +97,13 @@ export default class Board extends React.Component {
   }
 
   removeTouchListeners() {
-    if (this.touchMoveListener) {
-      this.touchMoveListener.remove();
-      this.touchMoveListener = null;
-    }
-    if (this.touchEndListener) {
-      this.touchEndListener.remove();
-      this.touchEndListener = null;
-    }
+    window.removeEventListener('touchmove', this.onBoardTouchMove, false);
+    window.removeEventListener('touchend', this.onBoardTouchEnd, false);
   }
 
   removeListeners() {
-    if (this.dragListener) {
-      this.dragListener.remove();
-      this.dragListener = null;
-    }
-    if (this.dragUpListener) {
-      this.dragUpListener.remove();
-      this.dragUpListener = null;
-    }
+    window.removeEventListener('mousemove', this.onBoardDrag, false);
+    window.removeEventListener('mouseup', this.onBoardDragEnd, false);
   }
 
   /**
@@ -123,21 +112,23 @@ export default class Board extends React.Component {
    * @return {undefined}
    */
   pointMoveTo(pos) {
-    const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-    let left = pos.x - rect.left;
-    let top = pos.y - rect.top;
+    if (!this.unloaded) {
+      const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
+      let left = pos.x - rect.left;
+      let top = pos.y - rect.top;
 
-    left = Math.max(0, left);
-    left = Math.min(left, WIDTH);
-    top = Math.max(0, top);
-    top = Math.min(top, HEIGHT);
+      left = Math.max(0, left);
+      left = Math.min(left, WIDTH);
+      top = Math.max(0, top);
+      top = Math.min(top, HEIGHT);
 
-    const hsv = {
-      h: this.props.hsv.h,
-      s: parseInt(left / WIDTH * 100, 10),
-      v: parseInt((1 - top / HEIGHT) * 100, 10),
-    };
-    this.props.onChange(hsv);
+      const hsv = {
+        h: this.props.hsv.h,
+        s: parseInt(left / WIDTH * 100, 10),
+        v: parseInt((1 - top / HEIGHT) * 100, 10),
+      };
+      this.props.onChange(hsv);
+    }
   }
 
   render() {

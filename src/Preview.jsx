@@ -25,7 +25,6 @@ export default class Preview extends React.Component {
           type="color"
           value={hex}
           onChange={this.onChange.bind(this)}
-          onClick={this.props.onInputClick}
         />
       </div>
     );
@@ -37,5 +36,4 @@ Preview.propTypes = {
   hsv: React.PropTypes.object,
   alpha: React.PropTypes.number,
   onChange: React.PropTypes.func,
-  onInputClick: React.PropTypes.func,
 };

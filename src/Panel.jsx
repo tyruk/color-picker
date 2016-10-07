@@ -24,13 +24,7 @@ export default class Panel extends React.Component {
       alpha: props.alpha || props.defaultAlpha,
     };
 
-    const events = [
-      'onChange',
-      'onAlphaChange',
-      'onFocus',
-      'onBlur',
-      'onSystemColorPickerOpen',
-    ];
+    const events = ['onChange', 'onAlphaChange'];
     // bind methods
     events.forEach(m => {
       this[m] = this[m].bind(this);
@@ -69,13 +63,6 @@ export default class Panel extends React.Component {
     this.props.onChange(ret);
   }
 
-  onSystemColorPickerOpen(e) {
-    // only work with broswer which support color input
-    if (e.target.type === 'color') {
-      this.systemColorPickerOpen = true;
-    }
-  }
-
   onAlphaChange(alpha) {
     if (this.props.alpha === undefined) {
       this.setState({
@@ -89,44 +76,20 @@ export default class Panel extends React.Component {
     });
   }
 
-  onFocus() {
-    if (this._blurTimer) {
-      clearTimeout(this._blurTimer);
-      this._blurTimer = null;
-    } else {
-      this.props.onFocus();
-    }
-  }
-
-  onBlur() {
-    if (this._blurTimer) {
-      clearTimeout(this._blurTimer);
-    }
-    this._blurTimer = setTimeout(()=> {
-      // if is system color picker open, then stop run blur
-      if (this.systemColorPickerOpen) {
-        this.systemColorPickerOpen = false;
-        return;
-      }
-
-      this.props.onBlur();
-    }, 100);
-  }
-
   getHexColor(hsv) {
     return colr.fromHsvObject(hsv || this.state.hsv).toHex();
   }
 
   render() {
-    const prefixCls = this.props.prefixCls;
+    const {prefixCls, onFocus, onBlur} = this.props;
     const hsv = this.state.hsv;
     const alpha = this.state.alpha;
     return (
       <div
         className={prefixCls}
         style={this.props.style}
-        onFocus={this.onFocus}
-        onBlur={this.onBlur}
+        onFocus={onFocus}
+        onBlur={onBlur}
         tabIndex="0"
         >
         <div className={prefixCls + '-' + ('inner')}>
@@ -156,7 +119,6 @@ export default class Panel extends React.Component {
                 rootPrefixCls={prefixCls}
                 alpha={alpha}
                 onChange={this.onChange}
-                onInputClick={this.onSystemColorPickerOpen}
                 hsv={hsv}
                 />
             </div>

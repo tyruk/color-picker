@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Colr from 'colr';
-import rcUtil from 'rc-util';
 
 const colr = new Colr();
 
@@ -25,6 +24,7 @@ export default class Alpha extends React.Component {
   }
 
   componentWillUnmount() {
+    this.unloaded = true;
     this.removeListeners();
   }
 
@@ -36,8 +36,8 @@ export default class Alpha extends React.Component {
       x, y,
     });
 
-    this.dragListener = rcUtil.Dom.addEventListener(window, 'mousemove', this.onDrag);
-    this.dragUpListener = rcUtil.Dom.addEventListener(window, 'mouseup', this.onDragEnd);
+    window.addEventListener('mousemove', this.onDrag, false);
+    window.addEventListener('mouseup', this.onDragEnd, false);
   }
 
   onDrag(e) {
@@ -70,27 +70,23 @@ export default class Alpha extends React.Component {
   }
 
   pointMoveTo(coords) {
-    const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-    const width = rect.width;
-    let left = coords.x - rect.left;
+    if (!this.unloaded) {
+      const rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
+      const width = rect.width;
+      let left = coords.x - rect.left;
 
-    left = Math.max(0, left);
-    left = Math.min(left, width);
+      left = Math.max(0, left);
+      left = Math.min(left, width);
 
-    const alpha = Math.floor(left / width * 100);
+      const alpha = Math.floor(left / width * 100);
 
-    this.props.onChange(alpha);
+      this.props.onChange(alpha);
+    }
   }
 
   removeListeners() {
-    if (this.dragListener) {
-      this.dragListener.remove();
-      this.dragListener = null;
-    }
-    if (this.dragUpListener) {
-      this.dragUpListener.remove();
-      this.dragUpListener = null;
-    }
+    window.removeEventListener('mousemove', this.onDrag, false);
+    window.removeEventListener('mouseup', this.onDragEnd, false);
   }
 
   render() {
